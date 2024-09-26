@@ -1,8 +1,9 @@
 from django.db import models
 from django.forms import ValidationError
+from django.contrib.auth.hashers import make_password
 
 # Create your models here.
-from django.db import models
+
 
 class Usuario(models.Model):
     id_usuario = models.AutoField(primary_key=True)
@@ -11,8 +12,17 @@ class Usuario(models.Model):
     contraseña = models.CharField(max_length=100)
     tipo_usuario = models.CharField(max_length=20)  # 'ofertante' o 'buscador'
 
+    def create_user(self, nombre, correo, contraseña, tipo_usuario):
+        return Usuario.objects.create(
+            nombre=nombre,
+            correo=correo,
+            contraseña=make_password(contraseña),  # Hashing password
+            tipo_usuario=tipo_usuario
+        )
+
     def __str__(self):
         return self.nombre
+
 
 
 class Servicio(models.Model):
