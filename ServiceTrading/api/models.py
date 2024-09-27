@@ -10,7 +10,7 @@ class Usuario(models.Model):
     nombre = models.CharField(max_length=100)
     correo = models.EmailField(unique=True)
     contraseña = models.CharField(max_length=100)
-    tipo_usuario = models.CharField(max_length=20)  # 'ofertante' o 'buscador'
+    tipo_usuario = models.CharField(max_length=20, blank=True)  # 'ofertante' o 'buscador'
 
     def create_user(self, nombre, correo, contraseña, tipo_usuario):
         return Usuario.objects.create(

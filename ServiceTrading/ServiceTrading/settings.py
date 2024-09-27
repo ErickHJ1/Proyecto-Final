@@ -26,7 +26,9 @@ SECRET_KEY = 'django-insecure-o@4wpb27olepkp2!=e@t==%%v!$rwr@2#er27zy$6+dics6c*&
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+CORS_ALLOWED_ALL_ORIGINS = [
+    'http://localhost:5174/'
+]
 
 # Application definition
 
@@ -40,7 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'api',
-    'rest_framework_authtoken',
+    'coreapi',
 ]
 # :v
 CORS_ALLOWED_ALL_ORIGINS = True
@@ -94,7 +96,6 @@ DATABASES = {
 }
 
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -135,3 +136,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    ...: ...,
+    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+}

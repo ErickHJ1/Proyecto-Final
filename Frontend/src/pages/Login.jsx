@@ -9,7 +9,7 @@ const Login = () => {
     const [passInput, setPassInput] = useState("")
     const [data, setData] = useState()
     const navegacion=useNavigate("")
-    
+    Login = useContext(AuthContext)
     useEffect(() => {
         async function fetchUsers() {
             try {
@@ -25,12 +25,12 @@ const Login = () => {
     async function loginUser() {
         console.log("datos obtenidos con boton", data);
         if (data) {
-          const user = data.find((user) => user.usuario === usuarioInput);
-          if (user && user.pass === passInput) {
+          const user = data.find((user) => user.nombre === usuarioInput);
+          if (user && user.pass === contraseña) {
             console.log("usuario y contraseña correcto", user.pass);
             alert("Inicio de sesión correcto");
             localStorage.setItem("id", user.id);
-            login()
+            Login()
             navegacion("/home");
           } else {
             alert("Usuario y contraseña no coinciden");
