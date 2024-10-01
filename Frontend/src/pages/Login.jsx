@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/authprovider";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Navbars from "../Components/Navbar";
 
 const Login = () => {
     const [usuarioInput, setUsuarioInput] = useState("");
@@ -19,6 +20,7 @@ const Login = () => {
             } catch (error) {
                 console.log("error");
             }
+
         }
         fetchUsers();
     }, []);
@@ -61,6 +63,9 @@ const Login = () => {
                             value={passInput} 
                             onChange={e => setPassInput(e.target.value)} 
                         />
+                    </div>
+                    <div>
+                      <input type="text" className="logo"/>
                     </div>
                     <button className="btn" type="button" onClick={loginUser}>Iniciar Sesion</button>
                 </form>

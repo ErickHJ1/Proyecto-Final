@@ -29,9 +29,9 @@ class Servicio(models.Model):
     id_servicio = models.AutoField(primary_key=True)
     descripcion = models.TextField()
     categoria = models.CharField(max_length=50)
-    disponibilidad = models.BooleanField(default=True)
+    disponibilidad = models.BooleanField(default=True, blank=True)
     localizacion = models.CharField(max_length=100)
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='servicios')
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='servicios', blank=True)
 
     def __str__(self):
         return self.descripcion

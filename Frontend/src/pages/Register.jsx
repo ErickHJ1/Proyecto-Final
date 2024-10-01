@@ -1,6 +1,7 @@
 import axios from "axios"
 import {useNavigate} from "react-router-dom"
 import { useEffect, useState } from "react"
+import Navbars from "../Components/Navbar"
 const Register = () => {
     const [correo, setCorreo] = useState('')
     const [nombre, setUsuario] = useState('')
@@ -9,7 +10,6 @@ const Register = () => {
     
     return(
         <>
-        
         <h1>Registro</h1>
         <div className="base">
             <div className="wrapper">
