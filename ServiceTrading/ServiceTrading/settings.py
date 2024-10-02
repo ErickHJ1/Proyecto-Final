@@ -41,9 +41,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'api',
-    'coreapi',
+    'coreapi'
 ]
-# :v
 CORS_ALLOW_ALL_ORIGINS = True 
 
 CORS_ALLOW_HEADERS = [
@@ -145,6 +144,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# :v
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

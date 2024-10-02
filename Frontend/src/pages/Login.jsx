@@ -1,77 +1,83 @@
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../contexts/authprovider";
+// Login.jsx
+import { useEffect, useState } from "react";
 import axios from "axios";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import Navbars from "../Components/Navbar";
+import swal from 'sweetalert';
+import '../App.css'
 
-const Login = () => {
-    const [usuarioInput, setUsuarioInput] = useState("");
-    const [passInput, setPassInput] = useState("");
-    const [data, setData] = useState();
-    const navegacion = useNavigate();
-    const { login } = useContext(AuthContext);
+import React from 'react';
+import styled from 'styled-components';
+
+const StyledInput = styled.input`
+  border: 2px solid #E91E63;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 16px;
+  width: 100%;
+  outline: none;
+  
+  &:focus {
+    border-color: #9C27B0;
+    box-shadow: 0 0 5px rgba(156, 39, 176, 0.5);
+  }
+`;
+
+const Login = ({ setUser }) => {
+    const { register, handleSubmit } = useForm();
+    const [data, setData] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function fetchUsers() {
             try {
                 const response = await axios.get('http://127.0.0.1:8000/api/v1/usuario/');
-                console.log(response.data);
                 setData(response.data);
             } catch (error) {
-                console.log("error");
+                console.error("Error fetching users:", error);
             }
-
         }
         fetchUsers();
     }, []);
 
-    async function loginUser() {
-        console.log("datos obtenidos con boton", data);
-        if (data) {
-            const user = data.find((user) => user.nombre === usuarioInput);
-            if (user && user.contraseña === passInput) { 
-                console.log("usuario y contraseña correcto", user.pass);
-                alert("Inicio de sesión correcto");
-                localStorage.setItem("id", user.id);
-                login(); // Llama a la función de login
-                navegacion("/home");
-            } else {
-                alert("Usuario y contraseña no coinciden");
-            }
+    const onSubmit = (formData) => {
+        const user = data.find((user) => user.nombre === formData.email);
+        if (user && user.contraseña === formData.password) {
+            swal("Bienvenido", user.nombre, "success");
+            setUser(user); // Actualiza el estado del usuario aquí
+            navigate("/home");
         } else {
-            console.log("No data received from the API");
+            swal("Contraseña incorrecta", "Por favor, verifique su contraseña", "error");
         }
-    }
+    };
 
     return (
         <div className="base">
             <div className="wrapper">
-                <form>
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <h1>Login</h1>
-                    <div className="input-box">
+                    <div className="input-box mb-3">
+                        <label>Email</label>
                         <input 
                             type="text" 
-                            placeholder="Correo" 
-                            value={usuarioInput} 
-                            onChange={e => setUsuarioInput(e.target.value)} 
+                            className="form-control" 
+                            {...register('email', { required: true })} 
                         />
                     </div>
-                    <div className="input-box">
+                    <div className="input-box mb-3">
+                        <label>Password</label>
                         <input 
                             type="password" 
-                            placeholder="Contraseña" 
-                            value={passInput} 
-                            onChange={e => setPassInput(e.target.value)} 
+                            className="form-control" 
+                            {...register('password', { required: true })} 
                         />
                     </div>
-                    <div>
-                      <input type="text" className="logo"/>
-                    </div>
-                    <button className="btn" type="button" onClick={loginUser}>Iniciar Sesion</button>
+                    <button className="btn" type="submit">Iniciar Sesion</button>
                 </form>
             </div>
         </div>
     );
-}
+};
 
 export default Login;
+

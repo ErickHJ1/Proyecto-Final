@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+
 const ServiceManager = () => {
   const [descripcion, setDescripcion] = useState("")
   const [usuario, setUsuario] = useState("")
@@ -34,9 +35,9 @@ const ServiceManager = () => {
   return (
       <>
       <form>
-          <input type="text" value={descripcion} placeholder="Correo" onChange={e => setDescripcion(e.target.value)}/>
+          <input type="text" value={descripcion} placeholder="Descripcion" onChange={e => setDescripcion(e.target.value)}/>
           <input type="text" value={usuario} placeholder="Usuario" onChange={e => setUsuario(e.target.value)}/>
-          <input type="text" value={localizacion} placeholder="Mensaje" onChange={e => setLocalizacion(e.target.value)}/>
+          <input type="text" value={localizacion} placeholder="Localizacion" onChange={e => setLocalizacion(e.target.value)}/>
           <input type="text" value={categoria} placeholder="Categoria" onChange={e => setCategoria(e.target.value)}/>
           <button type="button" onClick={addRequest}>Enviar Informacion</button>
       </form>

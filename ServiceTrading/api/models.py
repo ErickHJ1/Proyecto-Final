@@ -42,6 +42,7 @@ class Interaccion(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='interacciones')
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name='interacciones')
     estado = models.CharField(max_length=20)  # 'pendiente', 'aceptado', 'rechazado'
+    
 
     def __str__(self):
         return f"{self.usuario} -> {self.servicio}"
