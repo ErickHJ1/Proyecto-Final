@@ -1,3 +1,5 @@
+// Register.jsx
+
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -18,12 +20,12 @@ const Register = () => {
 
     async function addUser() {
         if (correo.trim() === '' || nombre.trim() === '' || clave.trim() === '') {
-            swal("Por favor, completa todos los campos.", );
+            swal("Por favor, completa todos los campos.", "error");
             return;
         }
 
         if (!validarCorreo(correo)) {
-            alert("Por favor, ingresa un correo electrónico válido.");
+            swal("Por favor, ingresa un correo electrónico válido.","error");
             return;
         }
 

@@ -7,21 +7,7 @@ import swal from 'sweetalert';
 import '../App.css'
 
 import React from 'react';
-import styled from 'styled-components';
 
-const StyledInput = styled.input`
-  border: 2px solid #E91E63;
-  border-radius: 6px;
-  padding: 12px;
-  font-size: 16px;
-  width: 100%;
-  outline: none;
-  
-  &:focus {
-    border-color: #9C27B0;
-    box-shadow: 0 0 5px rgba(156, 39, 176, 0.5);
-  }
-`;
 
 const Login = ({ setUser }) => {
     const { register, handleSubmit } = useForm();

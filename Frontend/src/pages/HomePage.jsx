@@ -1,3 +1,5 @@
+//HomePage.jsx
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbars from "../Components/Navbar";
@@ -61,6 +63,7 @@ const HomePage = () => {
           <p>No data available</p>
         )}
       </div>
+      
     </>
   );
 };
