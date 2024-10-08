@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'api',
-    'coreapi'
+    'coreapi',
+    'api'
 ]
 CORS_ALLOW_ALL_ORIGINS = True 
 
@@ -101,8 +101,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'servicetrading_db',
         'USER': 'root',
-        'PASSWORD': 'Erick-11072003',
-        'HOST': 'localhost',
+        'PASSWORD': 'root',
+        'HOST': 'mysql',
         'PORT': '3306',
     }
 }

@@ -1,16 +1,14 @@
 services:
   react:
     container_name: react_app
-    image: react_app
     build:
       context: ./Frontend
     volumes:
       - ./Frontend:/app
-      - /app/node_modules
     ports:
-      - "5173:5173"
+      - "5174:5173"  # Host port 5174 maps to container port 5173
+
   django:
-    image: django_app
     container_name: ServiceTrading_app
     build:
       context: ./ServiceTrading
@@ -21,15 +19,17 @@ services:
     command: ["./wait-for-it.sh", "-t", "30", "mysql:3306", "--", "python", "manage.py", "runserver", "0.0.0.0:8000"]
     depends_on:
       - mysql
+
   mysql:
     image: mysql:latest
     ports:
-      - "3307:3306"
+      - "3307:3306"  # Ensure this port is free
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=django-react
+      - MYSQL_DATABASE=servicetrading_db  
     volumes:
-      - django_react_data:/data/db
+      - django_react_data:/var/lib/mysql  # Correct MySQL volume path
       - ./dumps:/docker-entrypoint-initdb.d:ro
+
 volumes:
   django_react_data:

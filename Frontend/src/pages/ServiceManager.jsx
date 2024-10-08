@@ -1,5 +1,4 @@
-// React Component with Update and Delete Functionality
-
+// ServiceManager.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 import swal from 'sweetalert';
@@ -13,16 +12,18 @@ const ServiceManager = () => {
   const [serviceId, setServiceId] = useState(null);  // Estado para almacenar el ID del servicio a modificar
   const [services, setServices] = useState([]); // Estado para almacenar todos los servicios
 
-  // Fetch all services on component mount
-  useEffect(() => {
-    async function fetchServices() {
-      try {
-        const response = await axios.get('http://127.0.0.1:8000/api/v1/Servicios/');
-        setServices(response.data); // Store services in state
-      } catch (error) {
-        console.log("error");
-      }
+  // Function to fetch all services
+  async function fetchServices() {
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/api/v1/Servicios/');
+      setServices(response.data); // Store services in state
+    } catch (error) {
+      console.log("Error fetching services:", error);
     }
+  }
+
+  // Fetch services when component mounts
+  useEffect(() => {
     fetchServices();
   }, []);
 
@@ -36,20 +37,19 @@ const ServiceManager = () => {
     ) {
       swal("Por favor, completa todos los campos.");
       return;
-    } else {
-      try {
-        const newService = { descripcion, usuario, localizacion, categoria, disponibilidad };
-        await axios.post("http://127.0.0.1:8000/api/v1/Servicios/", newService);
-        swal("Servicio agregado correctamente");
-        setDescripcion(""); // Clear input after submission
-        setUsuario("");
-        setLocalizacion("");
-        setCategoria("");
-        setDisponibilidad(true);
-        fetchServices(); // Re-fetch services to update the list
-      } catch (error) {
-        console.error("Error al agregar el servicio:", error);
-      }
+    }
+    try {
+      const newService = { descripcion, usuario, localizacion, categoria, disponibilidad };
+      await axios.post("http://127.0.0.1:8000/api/v1/Servicios/", newService);
+      swal("Servicio agregado correctamente");
+      setDescripcion(""); // Clear input after submission
+      setUsuario("");
+      setLocalizacion("");
+      setCategoria("");
+      setDisponibilidad(true);
+      fetchServices(); // Re-fetch services to update the list
+    } catch (error) {
+      console.error("Error al agregar el servicio:", error);
     }
   }
 
@@ -165,5 +165,3 @@ const ServiceManager = () => {
 };
 
 export default ServiceManager;
-
-

@@ -1,5 +1,4 @@
-// App.jsx
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 import HomePage from './pages/HomePage';
@@ -11,20 +10,40 @@ import Register from './pages/Register';
 import Contact from './pages/Contact';
 
 function App() {
-  const [user, setUser] = useLocalStorage('user', null); // Asegúrate de que user se inicie como null
+  const [user, setUser] = useLocalStorage('user');
+  const [theme, setTheme] = useState('light'); // Estado del tema (claro por defecto)
+
+  // Cargar tema guardado en sessionStorage
+  useEffect(() => {
+    const savedTheme = sessionStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    document.documentElement.setAttribute('data-theme', savedTheme); // Aplicar tema al cargar la página
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    sessionStorage.setItem('theme', newTheme); // Guardar preferencia en sessionStorage
+    document.documentElement.setAttribute('data-theme', newTheme); // Aplicar el nuevo tema
+  };
+
+  
 
   return (
     <BrowserRouter>
       <div className="container mt-5">
+        <button onClick={toggleTheme} className="btn toggle-theme">
+          {theme === 'light' ? 'Modo Oscuro' : 'Modo Claro'}
+        </button>
         <Routes>
-          <Route element={<ProtectedRoute canActivate={!!user} redirectPath='/login' />}>
+          <Route path='/login' element={<Login setUser={setUser} />} />
+          <Route element={<ProtectedRoute canActivate={user} redirectPath='/login' />}>
             <Route path='/home' element={<HomePage />} />
             <Route path='/about' element={<AboutUs />} />
             <Route path='/manager' element={<ServiceManager />} />
             <Route path='/' element={<Register />} />
             <Route path='/contact' element={<Contact />} />
           </Route>
-          <Route path='/login' element={<Login setUser={setUser} />} />
         </Routes>
       </div>
     </BrowserRouter>
