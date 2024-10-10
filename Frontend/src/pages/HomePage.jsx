@@ -2,12 +2,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbars from "../Components/Navbar";
 import { Box, Card, Inset, Strong, Text } from "@radix-ui/themes";
-import '../App.css'; // Importamos los estilos generales
+import "../App.css"; // Importamos los estilos generales'
+import "../styles/Modal.css"
+
 
 const HomePage = () => {
   const [data, setData] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null); // Estado para el producto seleccionado
 
-  // Fetching services data
+  // Función para obtener los datos de los servicios
   const fetchUsers = async () => {
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/v1/Servicios/");
@@ -27,6 +30,16 @@ const HomePage = () => {
     fetchUsers();
   }, []);
 
+  // Función para manejar el clic en un producto y mostrarlo en el modal
+  const handleProductClick = (item) => {
+    setSelectedProduct(item);
+  };
+
+  // Función para cerrar el modal
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
+  };
+
   return (
     <>
       <Navbars />
@@ -35,17 +48,17 @@ const HomePage = () => {
           data.map((item, index) => (
             <ul className="productos" key={index}>
               <Box maxWidth="240px">
-                <Card className="card" size="9">
+                <Card className="card" size="9" onClick={() => handleProductClick(item)}>
                   <Inset clip="padding-box" side="top" pb="current">
                     <img
-                      src="https://images.unsplash.com/photo-1617050318658-a9a3175e34cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+                      src="Frontend\src\assets\GatoMewing.jpg"
                       alt="Bold typography"
                       style={{
-                        display: 'block',
-                        objectFit: 'cover',
-                        width: '100%',
+                        display: "block",
+                        objectFit: "cover",
+                        width: "100%",
                         height: 140,
-                        backgroundColor: 'var(--gray-5)',
+                        backgroundColor: "var(--gray-5)",
                       }}
                     />
                   </Inset>
@@ -60,10 +73,29 @@ const HomePage = () => {
         ) : (
           <p>No data available</p>
         )}
+
+        {/* Modal */}
+        {selectedProduct && (
+          <div className="modal">
+            <div className="modal-content">
+              <span className="close" onClick={handleCloseModal}>
+                &times;
+              </span>
+              <h2>{selectedProduct.nombre}</h2>
+              <p>{selectedProduct.descripcion}</p>
+              <p>Localización: {selectedProduct.localizacion}</p>
+              <p>Categoría: {selectedProduct.categoria}</p>
+              <img
+                src="https://images.unsplash.com/photo-1617050318658-a9a3175e34cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+                alt={selectedProduct.nombre}
+                style={{ width: "100%", height: "auto" }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
 };
 
 export default HomePage;
-

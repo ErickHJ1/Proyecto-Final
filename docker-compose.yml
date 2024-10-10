@@ -5,6 +5,7 @@ services:
       context: ./Frontend
     volumes:
       - ./Frontend:/app
+      - ./app/node_modules
     ports:
       - "5174:5173"  # Host port 5174 maps to container port 5173
 

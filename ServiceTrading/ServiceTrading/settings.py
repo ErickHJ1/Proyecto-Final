@@ -101,8 +101,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'servicetrading_db',
         'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'mysql',
+        'PASSWORD': 'Erick-11072003',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
