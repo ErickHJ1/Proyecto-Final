@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Cookies from "js-cookie"; // Importamos js-cookie
+import swal from "sweetalert";
 import Navbars from "../Components/Navbar";
 import { Box, Card, Inset, Strong, Text } from "@radix-ui/themes";
-import "../App.css"; // Importamos los estilos generales'
-import "../styles/Modal.css"
-
+import "../App.css";
+import "../styles/Modal.css";
 
 const HomePage = () => {
   const [data, setData] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null); // Estado para el producto seleccionado
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [comentario, setComentario] = useState("");
+  const [puntuacion, setPuntuacion] = useState(0);
+  const [valoraciones, setValoraciones] = useState([]);
 
-  // Función para obtener los datos de los servicios
+  // Obtener servicios desde la API
   const fetchUsers = async () => {
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/v1/Servicios/");
       const specificData = response.data.map((item) => ({
-        nombre: item.nombre, // Asegúrate de que 'nombre' exista en tu API
+        id: item.id_servicio,
+        nombre: item.nombre,
         descripcion: item.descripcion,
         categoria: item.categoria,
         localizacion: item.localizacion,
@@ -30,14 +35,52 @@ const HomePage = () => {
     fetchUsers();
   }, []);
 
-  // Función para manejar el clic en un producto y mostrarlo en el modal
-  const handleProductClick = (item) => {
+  const handleProductClick = async (item) => {
     setSelectedProduct(item);
+    try {
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/v1/Valoracion/?servicio=${item.id}`
+      );
+      setValoraciones(response.data);
+    } catch (error) {
+      console.error("Error al obtener valoraciones:", error);
+    }
   };
 
-  // Función para cerrar el modal
   const handleCloseModal = () => {
     setSelectedProduct(null);
+    setComentario("");
+    setPuntuacion(0);
+  };
+
+  const submitComment = async () => {
+    const user = JSON.parse(Cookies.get("user")); // Leemos la cookie del usuario
+    if (!user) {
+      swal("No estás autenticado");
+      return;
+    }
+
+    if (!comentario.trim()) {
+      swal("El comentario no puede estar vacío.");
+      return;
+    }
+
+    const newComentario = {
+      usuario: user.id_usuario, // Enviamos el ID del usuario logueado
+      servicio: selectedProduct.id,
+      puntuacion,
+      comentario,
+    };
+
+    try {
+      await axios.post("http://127.0.0.1:8000/api/v1/Valoracion/", newComentario);
+      swal("Comentario agregado correctamente");
+      setComentario("");
+      setPuntuacion(0);
+      handleProductClick(selectedProduct); // Refrescar comentarios
+    } catch (error) {
+      console.error("Error al agregar comentario:", error);
+    }
   };
 
   return (
@@ -51,8 +94,8 @@ const HomePage = () => {
                 <Card className="card" size="9" onClick={() => handleProductClick(item)}>
                   <Inset clip="padding-box" side="top" pb="current">
                     <img
-                      src="Frontend\src\assets\GatoMewing.jpg"
-                      alt="Bold typography"
+                      src="Frontend/src/assets/GatoMewing.jpg"
+                      alt="Servicio"
                       style={{
                         display: "block",
                         objectFit: "cover",
@@ -71,10 +114,9 @@ const HomePage = () => {
             </ul>
           ))
         ) : (
-          <p>No data available</p>
+          <p>No hay servicios disponibles</p>
         )}
 
-        {/* Modal */}
         {selectedProduct && (
           <div className="modal">
             <div className="modal-content">
@@ -85,11 +127,29 @@ const HomePage = () => {
               <p>{selectedProduct.descripcion}</p>
               <p>Localización: {selectedProduct.localizacion}</p>
               <p>Categoría: {selectedProduct.categoria}</p>
-              <img
-                src="https://images.unsplash.com/photo-1617050318658-a9a3175e34cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
-                alt={selectedProduct.nombre}
-                style={{ width: "100%", height: "auto" }}
+
+              <h3>Comentarios:</h3>
+              <ul>
+                {valoraciones.map((valoracion) => (
+                  <li key={valoracion.id_valoracion}>
+                    {valoracion.comentario} - {valoracion.puntuacion} estrellas
+                  </li>
+                ))}
+              </ul>
+
+              <textarea
+                placeholder="Escribe tu comentario..."
+                value={comentario}
+                onChange={(e) => setComentario(e.target.value)}
               />
+              <input
+                type="number"
+                min="1"
+                max="5"
+                value={puntuacion}
+                onChange={(e) => setPuntuacion(e.target.value)}
+              />
+              <button onClick={submitComment}>Enviar comentario</button>
             </div>
           </div>
         )}

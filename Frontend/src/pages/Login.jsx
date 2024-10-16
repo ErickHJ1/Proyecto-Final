@@ -3,6 +3,7 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import swal from 'sweetalert';
+import Cookies from 'js-cookie'; // Importamos js-cookie
 import '../App.css'; // Importamos los estilos generales
 
 const Login = ({ setUser }) => {
@@ -26,8 +27,8 @@ const Login = ({ setUser }) => {
     const user = data.find((user) => user.nombre === formData.email);
     if (user && user.contraseña === formData.password) {
       swal("Bienvenido", user.nombre, "success");
-      sessionStorage.setItem('user', JSON.stringify(formData));
-      setUser(user); // Actualiza el estado del usuario
+      Cookies.set('user', JSON.stringify(user), { expires: 1 }); // Guardamos el usuario en cookies
+      setUser(user); // Actualizamos el estado del usuario
       navigate("/home");
     } else {
       swal("Contraseña incorrecta", "Por favor, verifique su contraseña", "error");
