@@ -16,7 +16,14 @@ class InteraccionSerializer(serializers.ModelSerializer):
         model=Interaccion
         fields=['usuario','servicio','estado']
         
+
 class ValoracionSerializer(serializers.ModelSerializer):
+    usuario = UsuarioSerializer(read_only=True)  # Incluimos la información del usuario
+
+    class Meta:
+        model = Valoracion
+        fields = ['id_valoracion', 'servicio', 'usuario', 'comentario', 'puntuacion']
+
     class Meta:
         model=Valoracion
         fields=['usuario','servicio','puntuacion','comentario']

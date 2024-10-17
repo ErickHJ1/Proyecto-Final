@@ -5,6 +5,9 @@ from django.contrib.auth.hashers import make_password
 # Create your models here.
 
 
+from django.contrib.auth.hashers import make_password
+from django.db import models
+
 class Usuario(models.Model):
     id_usuario = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
@@ -12,16 +15,20 @@ class Usuario(models.Model):
     contraseña = models.CharField(max_length=100)
     tipo_usuario = models.CharField(max_length=20, blank=True)  # 'ofertante' o 'buscador'
 
-    def create_user(self, nombre, correo, contraseña, tipo_usuario):
-        return Usuario.objects.create(
+    # Método para crear un usuario con contraseña encriptada
+    @classmethod
+    def create_user(cls, nombre, correo, contraseña, tipo_usuario=""):
+        return cls.objects.create(
             nombre=nombre,
             correo=correo,
-            contraseña=make_password(contraseña),  # Hashing password
+            contraseña=make_password(contraseña),  # Hasheando la contraseña
             tipo_usuario=tipo_usuario
         )
 
+    # Devuelve el nombre del usuario como representación del objeto
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} ({self.correo})"
+
 
 
 

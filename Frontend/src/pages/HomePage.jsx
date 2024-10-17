@@ -54,24 +54,27 @@ const HomePage = () => {
   };
 
   const submitComment = async () => {
-    const user = JSON.parse(Cookies.get("user")); // Leemos la cookie del usuario
+    const user = Cookies.get('user'); // Obtenemos la cookie con el usuario
+  
     if (!user) {
       swal("No estás autenticado");
       return;
     }
-
+  
+    const parsedUser = JSON.parse(user); // Parseamos la cookie a un objeto
+  
     if (!comentario.trim()) {
       swal("El comentario no puede estar vacío.");
       return;
     }
-
+  
     const newComentario = {
-      usuario: user.id_usuario, // Enviamos el ID del usuario logueado
+      usuario: parsedUser.id_usuario,  // Enviamos la ID del usuario
       servicio: selectedProduct.id,
       puntuacion,
       comentario,
     };
-
+  
     try {
       await axios.post("http://127.0.0.1:8000/api/v1/Valoracion/", newComentario);
       swal("Comentario agregado correctamente");
@@ -132,7 +135,7 @@ const HomePage = () => {
               <ul>
                 {valoraciones.map((valoracion) => (
                   <li key={valoracion.id_valoracion}>
-                    {valoracion.comentario} - {valoracion.puntuacion} estrellas
+                    <strong>{valoracion.usuario.nombre}:</strong> {valoracion.comentario} - {valoracion.puntuacion} estrellas
                   </li>
                 ))}
               </ul>
