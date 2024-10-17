@@ -27,14 +27,13 @@ const Login = ({ setUser }) => {
     const user = data.find((user) => user.nombre === formData.email);
     if (user && user.contraseña === formData.password) {
       swal("Bienvenido", user.nombre, "success");
-      Cookies.set('user', JSON.stringify(user), { expires: 1 }); // Guardamos el usuario en cookies
-      setUser(user); // Actualizamos el estado del usuario
+      Cookies.set('user', JSON.stringify({ usuario_id: user.id_usuario }), { expires: 1 }); // Guardar cookie por 1 día
+      setUser(user);
       navigate("/home");
     } else {
       swal("Contraseña incorrecta", "Por favor, verifique su contraseña", "error");
     }
   };
-
   return (
     <div className="base">
       <div className="wrapper">

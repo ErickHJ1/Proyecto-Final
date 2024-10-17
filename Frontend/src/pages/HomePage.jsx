@@ -28,6 +28,8 @@ const HomePage = () => {
       setData(specificData);
     } catch (error) {
       console.error("Error al obtener datos:", error);
+      
+
     }
   };
 
@@ -39,13 +41,14 @@ const HomePage = () => {
     setSelectedProduct(item);
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/api/v1/Valoracion/?servicio=${item.id}`
+        `http://127.0.0.1:8000/api/v1/Valoracion/?servicio=${item.id}` // Asegúrate de usar mayúscula inicial
       );
       setValoraciones(response.data);
     } catch (error) {
       console.error("Error al obtener valoraciones:", error);
     }
   };
+  
 
   const handleCloseModal = () => {
     setSelectedProduct(null);
@@ -54,14 +57,19 @@ const HomePage = () => {
   };
 
   const submitComment = async () => {
-    const user = Cookies.get('user'); // Obtenemos la cookie con el usuario
+    const user = Cookies.get('user'); // Obtener cookie
   
     if (!user) {
       swal("No estás autenticado");
       return;
     }
   
-    const parsedUser = JSON.parse(user); // Parseamos la cookie a un objeto
+    const parsedUser = JSON.parse(user); // Parsear cookie a objeto
+  
+    if (!parsedUser.usuario_id) {
+      swal("ID de usuario no encontrado en la cookie.");
+      return;
+    }
   
     if (!comentario.trim()) {
       swal("El comentario no puede estar vacío.");
@@ -69,7 +77,7 @@ const HomePage = () => {
     }
   
     const newComentario = {
-      usuario: parsedUser.id_usuario,  // Enviamos la ID del usuario
+      usuario: parsedUser.usuario_id,  // Enviar ID del usuario
       servicio: selectedProduct.id,
       puntuacion,
       comentario,
@@ -83,9 +91,10 @@ const HomePage = () => {
       handleProductClick(selectedProduct); // Refrescar comentarios
     } catch (error) {
       console.error("Error al agregar comentario:", error);
+      
+
     }
   };
-
   return (
     <>
       <Navbars />

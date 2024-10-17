@@ -24,7 +24,7 @@ class Usuario(models.Model):
             contraseña=make_password(contraseña),  # Hasheando la contraseña
             tipo_usuario=tipo_usuario
         )
-
+    
     # Devuelve el nombre del usuario como representación del objeto
     def __str__(self):
         return f"{self.nombre} ({self.correo})"

@@ -18,12 +18,16 @@ class InteraccionSerializer(serializers.ModelSerializer):
         
 
 class ValoracionSerializer(serializers.ModelSerializer):
-    usuario = UsuarioSerializer(read_only=True)  # Incluimos la información del usuario
+    # Usamos PrimaryKeyRelatedField para aceptar el ID del usuario
+    usuario = serializers.PrimaryKeyRelatedField(queryset=Usuario.objects.all())
 
     class Meta:
         model = Valoracion
         fields = ['id_valoracion', 'servicio', 'usuario', 'comentario', 'puntuacion']
 
-    class Meta:
-        model=Valoracion
-        fields=['usuario','servicio','puntuacion','comentario']
+    def validate(self, data):
+        if not data.get('usuario'):
+            raise serializers.ValidationError("El usuario es requerido.")
+        if not data.get('servicio'):
+            raise serializers.ValidationError("El servicio es requerido.")
+        return data
