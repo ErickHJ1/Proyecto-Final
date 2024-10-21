@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import swal from 'sweetalert';
-import '../App.css'
+import Cookies from 'js-cookie'; // For token storage
+import '../App.css';
 
 const Register = () => {
   const [correo, setCorreo] = useState('');
@@ -27,11 +28,28 @@ const Register = () => {
     }
 
     try {
-      const newUser = { correo, nombre, contraseña: clave };
-      await axios.post('http://127.0.0.1:8000/api/v1/usuario/', newUser);
-      navigate('/login');
+      // 1. Register the user
+      const newUser = { username:nombre, email:correo, password: clave };
+      await axios.post('http://127.0.0.1:8000/pepepeneloco/', newUser);
+
+      // // 2. Log the user in automatically after registration
+      // const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+      //   email: correo,
+      //   password: clave,
+      // });
+
+      // const { access, refresh } = response.data;
+
+      // 3. Store JWT tokens
+      // Cookies.set('access_token', access, { expires: 1 }); // 1 day expiration
+      // Cookies.set('refresh_token', refresh, { expires: 7 }); // 7 days expiration
+
+      swal('Usuario registrado con éxito', 'Bienvenido', 'success');
+      navigate('/login'); // Redirect to home page
+
     } catch (error) {
       console.error('Error al agregar el usuario:', error);
+      swal('Error al registrar el usuario', 'Inténtalo de nuevo', 'error');
     }
   }
 
@@ -71,4 +89,3 @@ const Register = () => {
 };
 
 export default Register;
-

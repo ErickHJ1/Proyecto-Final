@@ -19,7 +19,7 @@ const ServiceManager = () => {
     try {
       const response = await axios.get('http://127.0.0.1:8000/api/v1/Servicios/');
       const userServices = response.data.filter(
-        service => service.usuario === loggedUser.id_usuario // Filtrar servicios por el usuario logueado
+        service => service.usuario === loggedUser.usuario_id // Filtrar servicios por el usuario logueado
       );
       setServices(userServices);
     } catch (error) {
@@ -34,15 +34,30 @@ const ServiceManager = () => {
 
   // Función para agregar un nuevo servicio
   async function addRequest() {
+    const user = Cookies.get('user'); // Obtener cookie
+
     if (descripcion.trim() === "" || localizacion.trim() === "" || categoria.trim() === "") {
       swal("Por favor, completa todos los campos.");
       return;
     }
 
+    const loggedUser = JSON.parse(user); // Parsear cookie a objeto
+
+    if (!user) {
+      swal("No", "error")
+      return
+    }
+
+    if (!loggedUser.usuario_id) {
+      swal("ID de usuario no encontrado en la cookie.");
+      return;
+    }
+  
+
     try {
       const newService = {
         descripcion,
-        usuario: loggedUser.id_usuario, // Usar el ID del usuario logueado
+        usuario: loggedUser.usuario_id, // Usar el ID del usuario logueado
         localizacion,
         categoria,
         disponibilidad,
@@ -67,7 +82,7 @@ const ServiceManager = () => {
     try {
       const updatedService = {
         descripcion,
-        usuario: loggedUser.id_usuario, // Aseguramos que el servicio pertenezca al usuario logueado
+        usuario: loggedUser.usuario_id,// Aseguramos que el servicio pertenezca al usuario logueado
         localizacion,
         categoria,
         disponibilidad,
