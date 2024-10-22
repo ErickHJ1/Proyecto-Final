@@ -13,27 +13,22 @@ const Login = ({ setUser }) => {
 
   const onSubmit = async (formData) => {
     try {
-      // Request JWT token from the Django backend
       const response = await axios.post('http://127.0.0.1:8000/zaguatelogueado/', {
         email: formData.email,
         password: formData.password,
       });
-      console.log(response.data.access_token);
-      
-      // const { access, refresh } = response.data; // Extract tokens
-
-      // // Store the tokens in cookies or local storage
-      
-      if (response.data.access_token){
-        navigate("/home")
-       
+  
+      if (response.data.access_token) {
+        // Store UsuarioT ID in cookies
+        Cookies.set('usuario_id', response.data.usuario_id, { expires: 1 }); // 1 day expiration
+        navigate("/home");
       }
-
     } catch (error) {
       setError("Error de inicio de sesión. Por favor, verifique sus credenciales.");
       swal("Error", "Correo o contraseña incorrectos", "error");
     }
   };
+  
 
   return (
     <div className="base">

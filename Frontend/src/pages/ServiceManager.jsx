@@ -3,46 +3,31 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import swal from 'sweetalert';
 
-
-
 const ServiceManager = () => {
   const [descripcion, setDescripcion] = useState("");
   const [localizacion, setLocalizacion] = useState("");
   const [categoria, setCategoria] = useState("");
   const [disponibilidad, setDisponibilidad] = useState(true);
   const [services, setServices] = useState([]);
-  const [loggedUser, setLoggedUser] = useState(null);
+  const [editingService, setEditingService] = useState(null); // Track editing service
+  const usuarioId = Cookies.get('usuario_id'); // Get UsuarioT ID from cookies
 
   useEffect(() => {
-    // Chequear la cookie del usuario al montar el componente
-    const userCookie = Cookies.get('user');
-    if (userCookie) {
-      try {
-        setLoggedUser(JSON.parse(userCookie));
-      } catch (error) {
-        console.error("Error al parsear la cookie:", error);
-        swal("Error", "Cookie de usuario inválida", "error");
-      }
+    if (usuarioId) {
+      fetchServices();
     } else {
       swal("Debes iniciar sesión").then(() => {
         window.location.href = "/login";
       });
     }
-  }, []);
-
-  useEffect(() => {
-    if (loggedUser) {
-      fetchServices();
-    }
-  }, [loggedUser]);
+  }, [usuarioId]);
 
   async function fetchServices() {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/v1/Servicios/");
-      const userServices = response.data.filter(
-        (service) => service.usuario === loggedUser.usuario_id
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/v1/Servicios/?usuario_id=${usuarioId}`
       );
-      setServices(userServices);
+      setServices(response.data);
     } catch (error) {
       console.error("Error al obtener servicios:", error);
     }
@@ -57,7 +42,7 @@ const ServiceManager = () => {
     try {
       const newService = {
         descripcion,
-        usuario: loggedUser.usuario_id,
+        usuario: usuarioId,
         localizacion,
         categoria,
         disponibilidad,
@@ -72,11 +57,56 @@ const ServiceManager = () => {
     }
   }
 
+  async function updateService() {
+    if (!editingService) return; // Ensure we're editing a service
+
+    try {
+      const updatedService = {
+        descripcion,
+        localizacion,
+        categoria,
+        disponibilidad,
+        usuario: usuarioId, // Ensure the backend receives the user ID
+      };
+
+      await axios.put(
+        `http://127.0.0.1:8000/api/v1/Servicios/${editingService.id_servicio}/`,
+        updatedService
+      );
+
+      swal("Servicio actualizado correctamente");
+      resetForm();
+      setEditingService(null); // Stop editing
+      fetchServices();
+    } catch (error) {
+      console.error("Error al actualizar servicio:", error.response.data); // Log backend response
+      swal("Error al actualizar servicio", error.response.data.detail || "Verifique los datos.", "error");
+    }
+  }
+
+  async function deleteService(serviceId) {
+    try {
+      await axios.delete(`http://127.0.0.1:8000/api/v1/Servicios/${serviceId}/`);
+      swal("Servicio eliminado");
+      fetchServices();
+    } catch (error) {
+      console.error("Error al eliminar servicio:", error);
+    }
+  }
+
   function resetForm() {
     setDescripcion("");
     setLocalizacion("");
     setCategoria("");
     setDisponibilidad(true);
+  }
+
+  function startEditing(service) {
+    setEditingService(service); // Set the service being edited
+    setDescripcion(service.descripcion);
+    setLocalizacion(service.localizacion);
+    setCategoria(service.categoria);
+    setDisponibilidad(service.disponibilidad);
   }
 
   return (
@@ -108,16 +138,22 @@ const ServiceManager = () => {
             onChange={() => setDisponibilidad(!disponibilidad)}
           />
         </label>
-        <button type="button" onClick={addRequest}>
-          Agregar Servicio
+
+        <button
+          type="button"
+          onClick={editingService ? updateService : addRequest}
+        >
+          {editingService ? "Actualizar Servicio" : "Agregar Servicio"}
         </button>
       </form>
 
-      <h2>Servicios de {loggedUser?.email}:</h2>
+      <h2>Tus Servicios:</h2>
       <ul>
         {services.map((service) => (
           <li key={service.id_servicio}>
             {service.descripcion} - {service.categoria} ({service.localizacion})
+            <button onClick={() => startEditing(service)}>Editar</button>
+            <button onClick={() => deleteService(service.id_servicio)}>Eliminar</button>
           </li>
         ))}
       </ul>

@@ -1,3 +1,4 @@
+from rest_framework.decorators import action
 import json
 from rest_framework import viewsets, filters
 from .serializer import UsuarioSerializer, ServicioSerializer, InteraccionSerializer, ValoracionSerializer
@@ -13,10 +14,40 @@ from datetime import timedelta
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
-    
+
+
+
 class ServicioViewSet(viewsets.ModelViewSet):
     queryset = Servicio.objects.all()
     serializer_class = ServicioSerializer
+
+    def get_queryset(self):
+        usuario_id = self.request.query_params.get('usuario_id')
+        if usuario_id:
+            return self.queryset.filter(usuario_id=usuario_id)
+        return self.queryset
+
+    @action(detail=True, methods=['patch'])
+    def update_service(self, request, pk=None):
+        try:
+            service = self.get_object()
+            serializer = self.get_serializer(service, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Servicio.DoesNotExist:
+            return Response({'error': 'Servicio no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['delete'])
+    def delete_service(self, request, pk=None):
+        try:
+            service = self.get_object()
+            service.delete()
+            return Response({'message': 'Servicio eliminado'}, status=status.HTTP_204_NO_CONTENT)
+        except Servicio.DoesNotExist:
+            return Response({'error': 'Servicio no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
     
 class InteraccionViewSet(viewsets.ModelViewSet):
     queryset = Interaccion.objects.all()
@@ -55,6 +86,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 
 
+# api/views.py
+
 class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
@@ -62,7 +95,8 @@ class LoginView(APIView):
 
         try:
             user = User.objects.get(email=email)
-        except User.DoesNotExist:
+            usuario_t = UsuarioT.objects.get(user=user)
+        except (User.DoesNotExist, UsuarioT.DoesNotExist):
             return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
         if authenticate(request, username=user.username, password=password):
@@ -72,20 +106,20 @@ class LoginView(APIView):
                 'access_token': str(refresh.access_token),
                 'refresh_token': str(refresh),
                 'email': user.email,
-                'usuario_id': user.id,
+                'usuario_id': usuario_t.id,  # Send UsuarioT ID
             }, status=status.HTTP_200_OK)
 
             response.set_cookie(
                 'user',
-                json.dumps({'usuario_id': user.id, 'email': user.email}),
-                max_age=60 * 60 * 24,  # 1 día
+                json.dumps({'usuario_id': usuario_t.id, 'email': user.email}),
+                max_age=60 * 60 * 24,  # 1 day
                 httponly=False,
                 samesite='Lax'
             )
             response.set_cookie(
                 'access_token',
                 str(refresh.access_token),
-                max_age=60 * 60 * 24,  # 1 día
+                max_age=60 * 60 * 24,  # 1 day
                 httponly=True,
                 samesite='Lax'
             )
