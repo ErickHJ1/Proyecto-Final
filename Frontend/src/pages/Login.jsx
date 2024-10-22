@@ -18,24 +18,16 @@ const Login = ({ setUser }) => {
         email: formData.email,
         password: formData.password,
       });
-      console.log(response.access_token);
+      console.log(response.data.access_token);
       
-      const { access, refresh } = response.data; // Extract tokens
+      // const { access, refresh } = response.data; // Extract tokens
 
-      // Store the tokens in cookies or local storage
-      Cookies.set('access_token', access, { expires: 1 }); // Expires in 1 day
-      Cookies.set('refresh_token', refresh, { expires: 7 }); // Refresh token expires in 7 days
- 
-      // Optionally, fetch user data with the access token
-      const userResponse = await axios.get(
-        'http://127.0.0.1:8000//',
-        { headers: { Authorization: `Bearer ${access}` } }
-      );
-
-      const user = userResponse.data;
-      setUser(user); // Set the user state
-      swal("Bienvenido", user.nombre, "success");
-      navigate("/home"); // Redirect to home page
+      // // Store the tokens in cookies or local storage
+      
+      if (response.data.access_token){
+        navigate("/home")
+       
+      }
 
     } catch (error) {
       setError("Error de inicio de sesión. Por favor, verifique sus credenciales.");

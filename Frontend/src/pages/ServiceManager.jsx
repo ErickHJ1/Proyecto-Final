@@ -1,63 +1,63 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Cookies from "js-cookie";  // Importamos la librería de cookies
+import Cookies from "js-cookie";
 import swal from 'sweetalert';
+
+
 
 const ServiceManager = () => {
   const [descripcion, setDescripcion] = useState("");
   const [localizacion, setLocalizacion] = useState("");
   const [categoria, setCategoria] = useState("");
   const [disponibilidad, setDisponibilidad] = useState(true);
-  const [services, setServices] = useState([]); // Almacena los servicios del usuario
-  const [selectedService, setSelectedService] = useState(null); // Servicio seleccionado para modificar
+  const [services, setServices] = useState([]);
+  const [loggedUser, setLoggedUser] = useState(null);
 
-  // Obtenemos el usuario logueado desde las cookies
-  const loggedUser = JSON.parse(Cookies.get('user') || '{}');
+  useEffect(() => {
+    // Chequear la cookie del usuario al montar el componente
+    const userCookie = Cookies.get('user');
+    if (userCookie) {
+      try {
+        setLoggedUser(JSON.parse(userCookie));
+      } catch (error) {
+        console.error("Error al parsear la cookie:", error);
+        swal("Error", "Cookie de usuario inválida", "error");
+      }
+    } else {
+      swal("Debes iniciar sesión").then(() => {
+        window.location.href = "/login";
+      });
+    }
+  }, []);
 
-  // Función para obtener los servicios del usuario logueado
+  useEffect(() => {
+    if (loggedUser) {
+      fetchServices();
+    }
+  }, [loggedUser]);
+
   async function fetchServices() {
     try {
-      const response = await axios.get('http://127.0.0.1:8000/api/v1/Servicios/');
+      const response = await axios.get("http://127.0.0.1:8000/api/v1/Servicios/");
       const userServices = response.data.filter(
-        service => service.usuario === loggedUser.usuario_id // Filtrar servicios por el usuario logueado
+        (service) => service.usuario === loggedUser.usuario_id
       );
       setServices(userServices);
     } catch (error) {
-      console.error("Error fetching services:", error);
+      console.error("Error al obtener servicios:", error);
     }
   }
 
-  // Llamar a fetchServices cuando el componente se monte
-  useEffect(() => {
-    fetchServices();
-  }, []);
-
-  // Función para agregar un nuevo servicio
   async function addRequest() {
-    const user = Cookies.get('user'); // Obtener cookie
-
-    if (descripcion.trim() === "" || localizacion.trim() === "" || categoria.trim() === "") {
+    if (!descripcion || !localizacion || !categoria) {
       swal("Por favor, completa todos los campos.");
       return;
     }
 
-    const loggedUser = JSON.parse(user); // Parsear cookie a objeto
-
-    if (!user) {
-      swal("No", "error")
-      return
-    }
-
-    if (!loggedUser.usuario_id) {
-      swal("ID de usuario no encontrado en la cookie.");
-      return;
-    }
-  
-
     try {
       const newService = {
         descripcion,
-        usuario: loggedUser.usuario_id, // Usar el ID del usuario logueado
+        usuario: loggedUser.usuario_id,
         localizacion,
         categoria,
         disponibilidad,
@@ -66,60 +66,13 @@ const ServiceManager = () => {
       await axios.post("http://127.0.0.1:8000/api/v1/Servicios/", newService);
       swal("Servicio agregado correctamente");
       resetForm();
-      fetchServices(); // Actualizar la lista de servicios
+      fetchServices();
     } catch (error) {
-      console.error("Error al agregar el servicio:", error);
+      console.error("Error al agregar servicio:", error);
     }
   }
 
-  // Función para modificar un servicio existente
-  async function updateRequest() {
-    if (!selectedService) {
-      swal("Selecciona un servicio para modificar");
-      return;
-    }
-
-    try {
-      const updatedService = {
-        descripcion,
-        usuario: loggedUser.usuario_id,// Aseguramos que el servicio pertenezca al usuario logueado
-        localizacion,
-        categoria,
-        disponibilidad,
-      };
-
-      await axios.put(`http://127.0.0.1:8000/api/v1/Servicios/${selectedService.id_servicio}/`, updatedService);
-      swal("Servicio modificado correctamente");
-      resetForm();
-      fetchServices(); // Actualizar la lista de servicios
-    } catch (error) {
-      console.error("Error al modificar el servicio:", error);
-    }
-  }
-
-  // Función para eliminar un servicio
-  async function deleteRequest(id) {
-    try {
-      await axios.delete(`http://127.0.0.1:8000/api/v1/Servicios/${id}/`);
-      swal("Servicio eliminado correctamente");
-      fetchServices(); // Actualizar la lista de servicios
-    } catch (error) {
-      console.error("Error al eliminar el servicio:", error);
-    }
-  }
-
-  // Función para cargar los datos del servicio seleccionado en el formulario
-  function selectService(service) {
-    setSelectedService(service);
-    setDescripcion(service.descripcion);
-    setLocalizacion(service.localizacion);
-    setCategoria(service.categoria);
-    setDisponibilidad(service.disponibilidad);
-  }
-
-  // Función para limpiar el formulario después de agregar o modificar
   function resetForm() {
-    setSelectedService(null);
     setDescripcion("");
     setLocalizacion("");
     setCategoria("");
@@ -128,24 +81,23 @@ const ServiceManager = () => {
 
   return (
     <>
-      {/* Formulario para agregar o modificar un servicio */}
       <form>
         <input
           type="text"
           value={descripcion}
-          placeholder="Descripcion"
+          placeholder="Descripción"
           onChange={(e) => setDescripcion(e.target.value)}
         />
         <input
           type="text"
           value={localizacion}
-          placeholder="Localizacion"
+          placeholder="Localización"
           onChange={(e) => setLocalizacion(e.target.value)}
         />
         <input
           type="text"
           value={categoria}
-          placeholder="Categoria"
+          placeholder="Categoría"
           onChange={(e) => setCategoria(e.target.value)}
         />
         <label>
@@ -156,30 +108,16 @@ const ServiceManager = () => {
             onChange={() => setDisponibilidad(!disponibilidad)}
           />
         </label>
-        {selectedService ? (
-          <button type="button" onClick={updateRequest}>
-            Modificar Servicio
-          </button>
-        ) : (
-          <button type="button" onClick={addRequest}>
-            Agregar Servicio
-          </button>
-        )}
-        {selectedService && (
-          <button type="button" onClick={resetForm}>
-            Cancelar
-          </button>
-        )}
+        <button type="button" onClick={addRequest}>
+          Agregar Servicio
+        </button>
       </form>
 
-      {/* Listado de servicios disponibles */}
-      <h2>Servicios Disponibles para {loggedUser.nombre}:</h2>
+      <h2>Servicios de {loggedUser?.email}:</h2>
       <ul>
-        {services.map(service => (
+        {services.map((service) => (
           <li key={service.id_servicio}>
             {service.descripcion} - {service.categoria} ({service.localizacion})
-            <button onClick={() => selectService(service)}>Modificar</button>
-            <button onClick={() => deleteRequest(service.id_servicio)}>Borrar</button>
           </li>
         ))}
       </ul>

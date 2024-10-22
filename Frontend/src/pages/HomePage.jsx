@@ -26,6 +26,7 @@ const HomePage = () => {
         localizacion: item.localizacion,
       }));
       setData(specificData);
+      console.log(Cookies.get('user.id'));
     } catch (error) {
       console.error("Error al obtener datos:", error);
       

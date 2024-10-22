@@ -2,6 +2,15 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
+
+
+
+class UsuarioT(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.user.username
+
 class UsuarioManager(BaseUserManager):
     """Custom manager to handle user creation."""
     
@@ -61,7 +70,7 @@ class Servicio(models.Model):
     categoria = models.CharField(max_length=50)
     disponibilidad = models.BooleanField(default=True, blank=True)
     localizacion = models.CharField(max_length=100)
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='servicios', blank=True)
+    usuario = models.ForeignKey(UsuarioT, on_delete=models.CASCADE, related_name='servicios')
 
     def __str__(self):
         return self.descripcion
@@ -69,7 +78,7 @@ class Servicio(models.Model):
 
 class Interaccion(models.Model):
     id_interaccion = models.AutoField(primary_key=True)
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='interacciones')
+    usuario = models.ForeignKey(UsuarioT, on_delete=models.CASCADE, related_name='interacciones')
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name='interacciones')
     estado = models.CharField(max_length=20)  # 'pendiente', 'aceptado', 'rechazado'
     
@@ -80,7 +89,7 @@ class Interaccion(models.Model):
 
 class Valoracion(models.Model):
     id_valoracion = models.AutoField(primary_key=True)
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='valoraciones')
+    usuario = models.ForeignKey(UsuarioT, on_delete=models.CASCADE, related_name='valoraciones')
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name='valoraciones')
     puntuacion = models.IntegerField()
     comentario = models.TextField()
@@ -89,6 +98,4 @@ class Valoracion(models.Model):
         return f"{self.usuario} valoró {self.servicio} con {self.puntuacion} estrellas"
 
 
-class UsuarioT(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
     
