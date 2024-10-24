@@ -29,16 +29,7 @@ class InteraccionSerializer(serializers.ModelSerializer):
 
 class ValoracionSerializer(serializers.ModelSerializer):
     """Serializer for the Valoracion model."""
-    usuario = serializers.PrimaryKeyRelatedField(queryset=Usuario.objects.all())
-
     class Meta:
         model = Valoracion
-        fields = ['id_valoracion', 'servicio', 'usuario', 'comentario', 'puntuacion']
+        fields = '__all__'
 
-    def validate(self, data):
-        """Validate required fields for Valoracion."""
-        if not data.get('usuario'):
-            raise serializers.ValidationError("El usuario es requerido.")
-        if not data.get('servicio'):
-            raise serializers.ValidationError("El servicio es requerido.")
-        return data

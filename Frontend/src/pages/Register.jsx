@@ -30,7 +30,7 @@ const Register = () => {
     try {
       // 1. Register the user
       const newUser = { username:nombre, email:correo, password: clave };
-      await axios.post('http://127.0.0.1:8000/pepepeneloco/', newUser);
+      await axios.post('http://127.0.0.1:8000/registro/', newUser);
 
       // // 2. Log the user in automatically after registration
       // const response = await axios.post('http://127.0.0.1:8000/api/token/', {

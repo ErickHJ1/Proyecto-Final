@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 
 class UsuarioT(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
+    edad = models.PositiveIntegerField(null=True, blank=True)
+    lugar_vivienda = models.CharField(max_length=255, null=True, blank=True)
     
     def __str__(self):
         return self.user.username
@@ -70,7 +72,7 @@ class Servicio(models.Model):
     categoria = models.CharField(max_length=50)
     disponibilidad = models.BooleanField(default=True, blank=True)
     localizacion = models.CharField(max_length=100)
-    usuario = models.ForeignKey(UsuarioT, on_delete=models.CASCADE, related_name='servicios')
+    usuario = models.ForeignKey(UsuarioT, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.descripcion
@@ -89,7 +91,7 @@ class Interaccion(models.Model):
 
 class Valoracion(models.Model):
     id_valoracion = models.AutoField(primary_key=True)
-    usuario = models.ForeignKey(UsuarioT, on_delete=models.CASCADE, related_name='valoraciones')
+    usuario_comentario = models.ForeignKey(UsuarioT, on_delete=models.CASCADE, related_name='valoraciones')
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name='valoraciones')
     puntuacion = models.IntegerField()
     comentario = models.TextField()

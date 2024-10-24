@@ -1,3 +1,5 @@
+# views.py
+
 from rest_framework.decorators import action
 import json
 from rest_framework import viewsets, filters
@@ -10,12 +12,36 @@ from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from datetime import timedelta
+from rest_framework.permissions import IsAuthenticated
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        perfil = UsuarioT.objects.get(user=user)
+        return Response({
+            'username': user.username,
+            'email': user.email,
+            'usuario_id': user.id,
+            'edad': perfil.edad,
+            'lugar_vivienda': perfil.lugar_vivienda
+        })
+
+    def post(self, request):
+        user = request.user
+        perfil = UsuarioT.objects.get(user=user)
+
+        perfil.edad = request.data.get('edad')
+        perfil.lugar_vivienda = request.data.get('lugar_vivienda')
+        perfil.save()
+
+        return Response({'message': 'Perfil actualizado correctamente'})
+
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
-
-
 
 class ServicioViewSet(viewsets.ModelViewSet):
     queryset = Servicio.objects.all()

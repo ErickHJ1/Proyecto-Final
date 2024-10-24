@@ -13,14 +13,15 @@ const Login = ({ setUser }) => {
 
   const onSubmit = async (formData) => {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/zaguatelogueado/', {
+      const response = await axios.post('http://localhost:8000/logintoken/', {
         email: formData.email,
         password: formData.password,
       });
   
       if (response.data.access_token) {
-        // Store UsuarioT ID in cookies
+        // Store UsuarioT ID & access token in cookies
         Cookies.set('usuario_id', response.data.usuario_id, { expires: 1 }); // 1 day expiration
+        Cookies.set('access_token', response.data.access_token, {expires: 1})
         navigate("/home");
       }
     } catch (error) {

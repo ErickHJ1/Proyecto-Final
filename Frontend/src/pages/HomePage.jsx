@@ -58,19 +58,19 @@ const HomePage = () => {
   };
 
   const submitComment = async () => {
-    const user = Cookies.get('user'); // Obtener cookie
+    const user = Cookies.get('usuario_id'); // Obtener cookie
   
     if (!user) {
       swal("No estás autenticado");
       return;
     }
   
-    const parsedUser = JSON.parse(user); // Parsear cookie a objeto
-  
-    if (!parsedUser.usuario_id) {
-      swal("ID de usuario no encontrado en la cookie.");
-      return;
-    }
+    // const parsedUser = JSON.parse(user.id); // Parsear cookie a objeto
+    
+    // if (!parsedUser.usuario_id) {
+    //   swal("ID de usuario no encontrado en la cookie.");
+    //   return;
+    // }
   
     if (!comentario.trim()) {
       swal("El comentario no puede estar vacío.");
@@ -78,7 +78,7 @@ const HomePage = () => {
     }
   
     const newComentario = {
-      usuario: parsedUser.usuario_id,  // Enviar ID del usuario
+      usuario_comentario: user,  // Enviar ID del usuario
       servicio: selectedProduct.id,
       puntuacion,
       comentario,
@@ -92,9 +92,9 @@ const HomePage = () => {
       handleProductClick(selectedProduct); // Refrescar comentarios
     } catch (error) {
       console.error("Error al agregar comentario:", error);
-      
-
     }
+    console.log(newComentario);
+    
   };
   return (
     <>
@@ -145,7 +145,7 @@ const HomePage = () => {
               <ul>
                 {valoraciones.map((valoracion) => (
                   <li key={valoracion.id_valoracion}>
-                    <strong>{valoracion.usuario.nombre}:</strong> {valoracion.comentario} - {valoracion.puntuacion} estrellas
+                    <strong>{valoracion.usuario_comentario}:</strong> {valoracion.comentario} - {valoracion.puntuacion} estrellas
                   </li>
                 ))}
               </ul>

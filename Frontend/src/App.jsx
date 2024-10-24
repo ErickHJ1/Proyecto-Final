@@ -8,6 +8,7 @@ import ProtectedRoute from './Components/utils/ProtectedRoute';
 import ServiceManager from './pages/ServiceManager';
 import Register from './pages/Register';
 import Contact from './pages/Contact';
+import Profile from './pages/Profile';
 
 function App() {
   const [user, setUser] = useLocalStorage('user');
@@ -43,6 +44,8 @@ function App() {
             <Route path='/manager' element={<ServiceManager />} />
             <Route path='/' element={<Register />} />
             <Route path='/contact' element={<Contact />} />
+            <Route path='/profile' element={<Profile/>}></Route>
+
           </Route>
         </Routes>
       </div>
