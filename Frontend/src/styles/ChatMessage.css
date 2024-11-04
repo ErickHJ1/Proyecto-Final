@@ -1,0 +1,25 @@
+/* ChatMessage.css */
+.chat-message {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #f5f5f5;
+    max-width: 400px;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.chat-text {
+    margin: 0;
+    color: #333;
+}
+
+.chat-date {
+    font-size: 0.8rem;
+    color: #888;
+}

@@ -1,0 +1,169 @@
+/* Definimos las variables globales de tema */
+:root {
+  --primary-bg: #f7f8fc;
+  --primary-text: #333;
+  --secondary-bg: #ffffff;
+  --secondary-text: #ff6b6b;
+  --input-bg: #ffffff;
+  --input-border: #eaeaea;
+  --btn-bg: #ff6b6b;
+  --btn-hover-bg: #ff4b4b;
+  --card-bg: #ffffff;
+  --card-shadow: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+  --primary-bg: #1e1e1e;
+  --primary-text: #f0f0f0;
+  --secondary-bg: #2a2a2a;
+  --secondary-text: #ff6b6b;
+  --input-bg: #2a2a2a;
+  --input-border: #555;
+  --btn-bg: #ff6b6b;
+  --btn-hover-bg: #ff4b4b;
+  --card-bg: #2a2a2a;
+  --card-shadow: rgba(255, 255, 255, 0.1);
+}
+
+/* Aplicamos las variables de color en todos los elementos */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--primary-bg);
+  color: var(--primary-text);
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2 {
+  color: var(--primary-text);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+a {
+  color: var(--secondary-text);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #ffffff;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.base {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--primary-bg);
+}
+
+/* Form Styles */
+.wrapper {
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px var(--card-shadow);
+  padding: 40px;
+  max-width: 400px;
+  width: 100%;
+}
+
+.input-box {
+  margin-bottom: 20px;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--primary-text);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus {
+  border-color: var(--secondary-text);
+  box-shadow: 0 0 8px rgba(255, 107, 107, 0.2);
+}
+
+button {
+  background-color: var(--btn-bg);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  width: 100%;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: var(--btn-hover-bg);
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Card Styles */
+.card {
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px var(--card-shadow);
+  padding: 20px;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+}
+
+.productos {
+  list-style: none;
+  padding: 0;
+}
+
+.productos img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+/* Navbar Styles */
+.navbar {
+  background-color: var(--btn-bg);
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+}
+
+.navbar a {
+  color: white;
+  font-weight: 500;
+}
+
+.navbar a:hover {
+  color: #ffffff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .productos {
+      grid-template-columns: 1fr;
+  }
+
+  .wrapper {
+      padding: 20px;
+  }
+}
+
