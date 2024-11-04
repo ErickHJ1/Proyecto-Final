@@ -1,193 +1,68 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import Cookies from "js-cookie"; // Librería para manejar cookies de autenticación
-import swal from "sweetalert"; // Librería para mostrar alertas a los usuarios
-import Navbars from "../Components/Navbar"; // Componente personalizado de Navbar
-import { Box, Card, Inset, Strong, Text } from "@radix-ui/themes"; // Componentes de UI de Radix
-import "../App.css"; // Estilos globales
-import "../styles/Modal.css"; // Estilos específicos para el modal
-import { useNavigate } from "react-router-dom"; // Hook de React Router para navegación
+import React, { useState } from "react"; // Importar React y el hook useState
+import axios from "axios"; // Importar axios para hacer peticiones HTTP
+import { useForm } from "react-hook-form"; // Importar useForm para manejar formularios
+import { useNavigate } from "react-router-dom"; // Importar useNavigate para redireccionar
+import swal from 'sweetalert'; // Importar swal para mostrar alertas
+import Cookies from 'js-cookie'; // Importar js-cookie para manejar cookies
+import '../App.css'; // Importar estilos
 
-const HomePage = () => {
-  // Estado para almacenar la lista de servicios obtenida de la API
-  const [data, setData] = useState([]);
-  // Estado para almacenar el producto seleccionado actualmente para mostrar en el modal
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  // Estado para el comentario ingresado por el usuario
-  const [comentario, setComentario] = useState("");
-  // Estado para la puntuación ingresada por el usuario
-  const [puntuacion, setPuntuacion] = useState(0);
-  // Estado para almacenar las valoraciones del servicio seleccionado
-  const [valoraciones, setValoraciones] = useState([]);
-  const navigate = useNavigate();
+const Login = ({ setUser }) => {
+  const { register, handleSubmit } = useForm(); // Inicializar useForm para el manejo de formularios
+  const [error, setError] = useState(null); // Estado para manejar errores
+  const navigate = useNavigate(); // Hook para redireccionar
 
-  // Función para obtener los servicios desde la API
-  const fetchUsers = async () => {
+  // Función para manejar el envío del formulario
+  const onSubmit = async (formData) => {
     try {
-      // Llamada a la API para obtener los servicios
-      const response = await axios.get("http://127.0.0.1:8000/api/v1/Servicios/");
-      // Mapear los datos de respuesta para solo incluir los campos necesarios
-      const specificData = response.data.map((item) => ({
-        id: item.id_servicio,
-        nombre: item.nombre,
-        descripcion: item.descripcion,
-        categoria: item.categoria,
-        localizacion: item.localizacion,
-        usuario: item.usuario,
-      }));
-      setData(specificData); // Guardar los datos filtrados en el estado
-      console.log(Cookies.get('user.id')); // Debug: mostrar el ID del usuario desde las cookies
+      // Petición POST al backend para realizar el inicio de sesión
+      const response = await axios.post('http://localhost:8000/logintoken/', {
+        email: formData.email,
+        password: formData.password,
+      });
+    
+      // Si se recibe un token de acceso, guardar datos en cookies
+      if (response.data.access_token) {
+        Cookies.set('usuario_id', response.data.usuario_id, { expires: 1 }); // Guardar ID de usuario
+        Cookies.set('access_token', response.data.access_token, { expires: 1 }); // Guardar token de acceso
+
+        // Guardar usuario en el estado local para el uso en `ProtectedRoute`
+        setUser(response.data);  // Esto asegura que el usuario esté "logueado"
+        navigate("/home"); // Redireccionar a la página de inicio
+      }
     } catch (error) {
-      console.error("Error al obtener datos:", error); // Mostrar error si falla la llamada a la API
+      // Manejo de errores en caso de que el inicio de sesión falle
+      setError("Error de inicio de sesión. Por favor, verifique sus credenciales."); // Establecer mensaje de error
+      swal("Error", "Correo o contraseña incorrectos", "error"); // Mostrar alerta de error
     }
-  };
-
-  // useEffect para obtener los datos de servicios al montar el componente
-  useEffect(() => {
-    fetchUsers(); // Llama a fetchUsers cuando el componente se carga
-  }, []);
-
-  // Función para manejar el clic en una tarjeta de servicio
-  const handleProductClick = async (item) => {
-    // Guardar el usuario y el ID del servicio en localStorage
-    localStorage.setItem('idPropServicio', item.usuario);
-    localStorage.setItem('idServicio', item.id);
-    setSelectedProduct(item); // Establecer el producto seleccionado para mostrar en el modal
-    try {
-      // Obtener las valoraciones para el servicio seleccionado
-      const response = await axios.get(
-        `http://127.0.0.1:8000/api/v1/Valoracion/?servicio=${item.id}`
-      );
-      setValoraciones(response.data); // Guardar los datos de valoraciones en el estado
-    } catch (error) {
-      console.error("Error al obtener valoraciones:", error); // Mostrar error si falla la llamada a la API
-    }
-  };
-
-  // Función para cerrar el modal
-  const handleCloseModal = () => {
-    setSelectedProduct(null); // Limpiar el producto seleccionado para cerrar el modal
-    setComentario(""); // Reiniciar el campo de comentario
-    setPuntuacion(0); // Reiniciar el campo de puntuación
-  };
-
-  // Función para manejar el envío de un comentario
-  const submitComment = async () => {
-    const user = Cookies.get('usuario_id'); // Obtener el ID del usuario desde las cookies
-
-    if (!user) {
-      swal("No estás autenticado"); // Mostrar alerta si el usuario no está autenticado
-      return;
-    }
-
-    if (!comentario.trim()) {
-      swal("El comentario no puede estar vacío."); // Mostrar alerta si el comentario está vacío
-      return;
-    }
-
-    // Construir el objeto de nuevo comentario
-    const newComentario = {
-      usuario_comentario: user,  // ID del usuario obtenido de la cookie
-      servicio: selectedProduct.id, // ID del servicio seleccionado
-      puntuacion, // Valor de puntuación del input
-      comentario, // Texto del comentario del input
-    };
-
-    try {
-      // Llamada a la API para enviar el comentario
-      await axios.post("http://127.0.0.1:8000/api/v1/Valoracion/", newComentario);
-      swal("Comentario agregado correctamente"); // Alerta de éxito
-      setComentario(""); // Limpiar el campo de comentario
-      setPuntuacion(0); // Reiniciar el campo de puntuación
-      handleProductClick(selectedProduct); // Refrescar los comentarios para el producto seleccionado
-    } catch (error) {
-      console.error("Error al agregar comentario:", error); // Mostrar error si falla el envío
-    }
-    console.log(newComentario); // Debug: mostrar los datos del nuevo comentario
   };
 
   return (
-    <>
-      <Navbars /> {/* Componente Navbar */}
-      <div className="contenedor">
-        {/* Renderizado condicional basado en la longitud de los datos */}
-        {data.length > 0 ? (
-          data.map((item, index) => (
-            <ul className="productos" key={index}>
-              <Box maxWidth="240px">
-                {/* Componente de tarjeta para cada servicio */}
-                <Card className="card" size="9" onClick={() => handleProductClick(item)}>
-                  <Inset clip="padding-box" side="top" pb="current">
-                    <img
-                      src="Frontend/src/assets/GatoMewing.jpg"
-                      alt="Servicio"
-                      style={{
-                        display: "block",
-                        objectFit: "cover",
-                        width: "100%",
-                        height: 140,
-                        backgroundColor: "var(--gray-5)",
-                      }}
-                    />
-                  </Inset>
-                  <Text as="p" size="3">
-                    <Strong>{item.nombre}</Strong>
-                    {item.descripcion}, localización: {item.localizacion}, categoría: {item.categoria}
-                  </Text>
-                </Card>
-              </Box>
-            </ul>
-          ))
-        ) : (
-          <p>No hay servicios disponibles</p> // Mensaje si no hay servicios disponibles
-        )}
-
-        {/* Modal para los detalles y comentarios del servicio seleccionado */}
-        {selectedProduct && (
-          <div className="modal">
-            <div className="modal-content">
-              <span className="close" onClick={handleCloseModal}>
-                &times; {/* Botón de cerrar */}
-              </span>
-              <h2>{selectedProduct.nombre}</h2> {/* Nombre del servicio */}
-              <p>{selectedProduct.descripcion}</p> {/* Descripción del servicio */}
-              <p>Localización: {selectedProduct.localizacion}</p> {/* Localización */}
-              <p>Categoría: {selectedProduct.categoria}</p> {/* Categoría */}
-
-              <h3>Comentarios:</h3>
-              <ul>
-                {/* Lista de comentarios */}
-                {valoraciones.map((valoracion) => (
-                  <li key={valoracion.id_valoracion}>
-                    <strong>{valoracion.usuario_nombre}:</strong> {valoracion.comentario} - {valoracion.puntuacion} estrellas
-                  </li>
-                ))}
-              </ul>
-
-              {/* Área de texto para nuevo comentario */}
-              <textarea
-                placeholder="Escribe tu comentario..."
-                value={comentario}
-                onChange={(e) => setComentario(e.target.value)}
-              />
-              {/* Input para la puntuación */}
-              <input
-                type="number"
-                min="1"
-                max="5"
-                value={puntuacion}
-                onChange={(e) => setPuntuacion(e.target.value)}
-              />
-              {/* Botón para enviar el comentario */}
-              <button onClick={submitComment}>Enviar comentario</button>
-              {/* Botón para navegar a la página de mensajes */}
-              <button onClick={() => navigate('/Dm')}>Enviar mensaje</button>
-            </div>
+    <div className="base">
+      <div className="wrapper">
+        <form onSubmit={handleSubmit(onSubmit)}> {/* Manejar el envío del formulario */}
+          <h1>Login</h1> {/* Título del formulario */}
+          {error && <p className="error">{error}</p>} {/* Mostrar mensaje de error si existe */}
+          <div className="input-box mb-3"> {/* Contenedor para el campo de email */}
+            <label>Email</label>
+            <input 
+              type="text" 
+              className="form-control" 
+              {...register('email', { required: true })} // Registrar el campo email como obligatorio
+            />
           </div>
-        )}
+          <div className="input-box mb-3"> {/* Contenedor para el campo de contraseña */}
+            <label>Password</label>
+            <input 
+              type="password" 
+              className="form-control" 
+              {...register('password', { required: true })} // Registrar el campo de contraseña como obligatorio
+            />
+          </div>
+          <button className="btn" type="submit">Iniciar Sesión</button> {/* Botón para enviar el formulario */}
+        </form>
       </div>
-    </>
+    </div>
   );
 };
 
-export default HomePage;
+export default Login; // Exportar el componente Login
