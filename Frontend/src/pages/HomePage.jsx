@@ -6,14 +6,14 @@ import Navbars from "../Components/Navbar";
 import { Box, Card, Inset, Strong, Text } from "@radix-ui/themes";
 import "../App.css";
 import "../styles/Modal.css";
-
+import { useNavigate } from "react-router-dom";
 const HomePage = () => {
   const [data, setData] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [comentario, setComentario] = useState("");
   const [puntuacion, setPuntuacion] = useState(0);
   const [valoraciones, setValoraciones] = useState([]);
-
+  const navigate = useNavigate()
   // Obtener servicios desde la API
   const fetchUsers = async () => {
     try {
@@ -24,6 +24,7 @@ const HomePage = () => {
         descripcion: item.descripcion,
         categoria: item.categoria,
         localizacion: item.localizacion,
+        usuario: item.usuario
       }));
       setData(specificData);
       console.log(Cookies.get('user.id'));
@@ -39,6 +40,8 @@ const HomePage = () => {
   }, []);
 
   const handleProductClick = async (item) => {
+    localStorage.setItem('idPropServicio',item.usuario)
+    localStorage.setItem('idServicio',item.id)
     setSelectedProduct(item);
     try {
       const response = await axios.get(
@@ -145,7 +148,7 @@ const HomePage = () => {
               <ul>
                 {valoraciones.map((valoracion) => (
                   <li key={valoracion.id_valoracion}>
-                    <strong>{valoracion.usuario_comentario}:</strong> {valoracion.comentario} - {valoracion.puntuacion} estrellas
+                    <strong>{valoracion.usuario_nombre}:</strong> {valoracion.comentario} - {valoracion.puntuacion} estrellas
                   </li>
                 ))}
               </ul>

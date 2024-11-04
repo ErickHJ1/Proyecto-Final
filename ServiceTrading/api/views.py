@@ -111,9 +111,6 @@ class RegistroView(APIView):
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-
-# api/views.py
-
 class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email')

@@ -9,6 +9,7 @@ import ServiceManager from './pages/ServiceManager';
 import Register from './pages/Register';
 import Contact from './pages/Contact';
 import Profile from './pages/Profile';
+import Dm from './pages/Dm';
 
 function App() {
   const [user, setUser] = useLocalStorage('user');
@@ -37,6 +38,7 @@ function App() {
           {theme === 'light' ? 'Modo Oscuro' : 'Modo Claro'}
         </button>
         <Routes>
+          {/* <ProtectedRoute canActivate={user} redirectPath='/login' /> */}
           <Route path='/login' element={<Login setUser={setUser} />} />
           <Route element={<ProtectedRoute canActivate={user} redirectPath='/login' />}>
             <Route path='/home' element={<HomePage />} />
@@ -45,6 +47,7 @@ function App() {
             <Route path='/' element={<Register />} />
             <Route path='/contact' element={<Contact />} />
             <Route path='/profile' element={<Profile/>}></Route>
+            <Route path='/Dm' element={<Dm/>}></Route>
 
           </Route>
         </Routes>

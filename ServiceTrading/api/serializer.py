@@ -29,7 +29,8 @@ class InteraccionSerializer(serializers.ModelSerializer):
 
 class ValoracionSerializer(serializers.ModelSerializer):
     """Serializer for the Valoracion model."""
+    usuario_nombre = serializers.CharField(source='usuario_comentario.user.username',required=False)
     class Meta:
         model = Valoracion
-        fields = '__all__'
+        fields = ['id_valoracion','usuario_comentario','servicio','puntuacion','comentario','usuario_nombre']
 

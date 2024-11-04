@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import swal from 'sweetalert';
+import CommentCard from "../Components/ComentarCard";
 
 const ServiceManager = () => {
   const [descripcion, setDescripcion] = useState("");
@@ -11,7 +12,7 @@ const ServiceManager = () => {
   const [services, setServices] = useState([]);
   const [editingService, setEditingService] = useState(null); // Track editing service
   const usuarioId = Cookies.get('usuario_id'); // Get UsuarioT ID from cookies
-
+  const [comentarios,setComentarios] = useState([])
   useEffect(() => {
     if (usuarioId) {
       fetchServices();
@@ -56,6 +57,20 @@ const ServiceManager = () => {
       console.error("Error al agregar servicio:", error);
     }
   }
+  
+  const traerComentarios = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/chat/caliente/privado/${usuarioId}/`);
+      setComentarios(response.data); // Aquí accedemos directamente a response.data
+    } catch (error) {
+      console.error('Error al traer los comentarios:', error); // Manejo de errores
+    }
+    console.log(comentarios);
+  };
+  
+  useEffect(() => {
+    traerComentarios();
+  }, [comentarios]);
 
   async function updateService() {
     if (!editingService) return; // Ensure we're editing a service
@@ -157,7 +172,16 @@ const ServiceManager = () => {
           </li>
         ))}
       </ul>
+    
+      <h2>Tus mensajes</h2>
+
+      {comentarios.map((comentario)=>{
+        return(
+        <CommentCard username={comentario.emisor} service={comentario.servicio} msg={comentario.mensaje}/>
+      ) 
+      })}
     </>
+
   );
 };
 

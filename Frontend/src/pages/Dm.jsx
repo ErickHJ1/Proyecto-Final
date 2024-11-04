@@ -1,9 +1,12 @@
+import Cookies from "js-cookie"
+import Chat from "../Components/Chat"
 
 
 const Dm = () => {
+    // const nombreUsuario = Cookies.get('')
 return(
     <>
-    <input type="text"/>
+    <Chat username={"Pepe pene loco"}/>
     </>
 )
 }

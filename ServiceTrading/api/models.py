@@ -4,12 +4,12 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 
 
-
 class UsuarioT(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     edad = models.PositiveIntegerField(null=True, blank=True)
     lugar_vivienda = models.CharField(max_length=255, null=True, blank=True)
-    
+    is_admin = models.BooleanField(default=False)  # New field for distinguishing admins
+
     def __str__(self):
         return self.user.username
 

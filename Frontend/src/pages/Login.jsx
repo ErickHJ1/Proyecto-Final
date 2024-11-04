@@ -13,24 +13,24 @@ const Login = ({ setUser }) => {
 
   const onSubmit = async (formData) => {
     try {
-      const response = await axios.post('http://localhost:8000/logintoken/', {
-        email: formData.email,
-        password: formData.password,
-      });
-  
-      if (response.data.access_token) {
-        // Store UsuarioT ID & access token in cookies
-        Cookies.set('usuario_id', response.data.usuario_id, { expires: 1 }); // 1 day expiration
-        Cookies.set('access_token', response.data.access_token, {expires: 1})
-        navigate("/home");
-      }
-    } catch (error) {
-      setError("Error de inicio de sesión. Por favor, verifique sus credenciales.");
-      swal("Error", "Correo o contraseña incorrectos", "error");
-    }
-  };
-  
+        const response = await axios.post('http://localhost:8000/logintoken/', {
+            email: formData.email,
+            password: formData.password,
+        });
+    
+        if (response.data.access_token) {
+            Cookies.set('usuario_id', response.data.usuario_id, { expires: 1 }); 
+            Cookies.set('access_token', response.data.access_token, { expires: 1 });
 
+            // Guardar usuario en localStorage para `ProtectedRoute`
+            setUser(response.data);  // Esto asegura que el usuario esté "logueado"
+            navigate("/home");
+        }
+    } catch (error) {
+        setError("Error de inicio de sesión. Por favor, verifique sus credenciales.");
+        swal("Error", "Correo o contraseña incorrectos", "error");
+    }
+};
   return (
     <div className="base">
       <div className="wrapper">
