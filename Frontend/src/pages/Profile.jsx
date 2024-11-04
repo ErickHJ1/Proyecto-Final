@@ -1,109 +1,114 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Cookies from "js-cookie";
-import swal from 'sweetalert';
-import Navbars from "../Components/Navbar";
-import { useNavigate } from "react-router-dom";
-
+import Cookies from "js-cookie"; // Librería para manejar cookies de autenticación
+import swal from 'sweetalert'; // Librería para mostrar alertas
+import Navbars from "../Components/Navbar"; // Componente de la barra de navegación
+import { useNavigate } from "react-router-dom"; // Hook para la navegación en React Router
 
 const Profile = () => {
-    const navigate = useNavigate();
-    const [userData, setUserData] = useState({
-        email: "",
-        username:"",
-        usuario_id: "",
-        edad: "",
+  const navigate = useNavigate(); // Hook para cambiar entre rutas
+  const [userData, setUserData] = useState({
+    email: "",
+    username: "",
+    usuario_id: "",
+    edad: "",
     lugar_vivienda: ""
   });
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // Estado para manejar si el perfil está en modo de edición
 
   useEffect(() => {
-      fetchProfile();
-    }, []);
-    
-    const fetchProfile = async () => {
-        try {
-            const token = Cookies.get("access_token");
+    fetchProfile(); // Llama a la función para obtener el perfil cuando el componente se monta
+  }, []);
+
+  // Función para obtener los datos del perfil desde la API
+  const fetchProfile = async () => {
+    try {
+      const token = Cookies.get("access_token"); // Obtener el token de autenticación
       const response = await axios.get("http://127.0.0.1:8000/perfil/", {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}` // Agregar token a la cabecera para autorización
         }
       });
-      setUserData(response.data);
+      setUserData(response.data); // Actualizar el estado con los datos obtenidos
     } catch (error) {
-      console.error("Error al obtener perfil:", error);
+      console.error("Error al obtener perfil:", error); // Mostrar error si falla la solicitud
     }
   };
 
+  // Función para manejar los cambios en los campos de entrada en modo de edición
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUserData((prevData) => ({ ...prevData, [name]: value }));
+    setUserData((prevData) => ({ ...prevData, [name]: value })); // Actualizar el valor correspondiente en el estado
   };
 
+  // Función para guardar los cambios en el perfil
   const handleSave = async () => {
     try {
-      const token = Cookies.get("access_token");
+      const token = Cookies.get("access_token"); // Obtener el token de autenticación
       await axios.post(
-        "http://127.0.0.1:8000/perfil/",
+        "http://127.0.0.1:8000/perfil/", // Ruta de la API para actualizar el perfil
         {
-          edad: userData.edad,
+          edad: userData.edad, // Enviar solo los campos editables
           lugar_vivienda: userData.lugar_vivienda
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}` // Cabecera de autorización
           }
         }
       );
-      swal("Perfil actualizado", "Tu perfil ha sido actualizado correctamente", "success");
-      setIsEditing(false);
+      swal("Perfil actualizado", "Tu perfil ha sido actualizado correctamente", "success"); // Alerta de éxito
+      setIsEditing(false); // Salir del modo de edición
     } catch (error) {
-      console.error("Error al actualizar perfil:", error);
-      swal("Error", "Hubo un problema al actualizar tu perfil", "error");
+      console.error("Error al actualizar perfil:", error); // Mostrar error en caso de fallo
+      swal("Error", "Hubo un problema al actualizar tu perfil", "error"); // Alerta de error
     }
   };
 
+  // Función para navegar a la página de mensajes directos
   const navigateToDm = () => {
-    navigate("/Dm")
-  }
+    navigate("/Dm"); // Cambia la ruta a la página de mensajes
+  };
 
   return (
     <>
-    <Navbars/>
-    <div className="profile-container">
-      <h2>Perfil de Usuario</h2>
-      <p>ID de Usuario: {userData.usuario_id}</p>
-      <p>Email: {userData.email}</p>
-      <p>Nombre: {userData.username}</p>
+      <Navbars /> {/* Componente de la barra de navegación */}
+      <div className="profile-container">
+        <h2>Perfil de Usuario</h2>
+        <p>ID de Usuario: {userData.usuario_id}</p>
+        <p>Email: {userData.email}</p>
+        <p>Nombre: {userData.username}</p>
 
-      {isEditing ? (
-        <>
-          <input
-            type="number"
-            name="edad"
-            placeholder="Edad"
-            value={userData.edad}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            name="lugar_vivienda"
-            placeholder="Lugar de Vivienda"
-            value={userData.lugar_vivienda}
-            onChange={handleInputChange}
-          />
-          <button onClick={handleSave}>Guardar</button>
-          <button onClick={() => setIsEditing(false)}>Cancelar</button>
-        </>
-      ) : (
-        <>
-          <p>Edad: {userData.edad || "No especificado"}</p>
-          <p>Lugar de Vivienda: {userData.lugar_vivienda || "No especificado"}</p>
-          <button onClick={() => setIsEditing(true)}>Editar Perfil</button>
-          <button onClick={navigateToDm}>Mensajes</button>
-        </>
-      )}
-    </div>
+        {isEditing ? (
+          <>
+            {/* Campos de entrada para editar la edad y lugar de vivienda */}
+            <input
+              type="number"
+              name="edad"
+              placeholder="Edad"
+              value={userData.edad}
+              onChange={handleInputChange}
+            />
+            <input
+              type="text"
+              name="lugar_vivienda"
+              placeholder="Lugar de Vivienda"
+              value={userData.lugar_vivienda}
+              onChange={handleInputChange}
+            />
+            <button onClick={handleSave}>Guardar</button> {/* Guardar los cambios */}
+            <button onClick={() => setIsEditing(false)}>Cancelar</button> {/* Cancelar edición */}
+          </>
+        ) : (
+          <>
+            {/* Mostrar la edad y lugar de vivienda en modo de solo lectura */}
+            <p>Edad: {userData.edad || "No especificado"}</p>
+            <p>Lugar de Vivienda: {userData.lugar_vivienda || "No especificado"}</p>
+            <button onClick={() => setIsEditing(true)}>Editar Perfil</button> {/* Activar modo de edición */}
+            <button onClick={navigateToDm}>Mensajes</button> {/* Navegar a mensajes */}
+          </>
+        )}
+      </div>
     </>
   );
 };

@@ -1,11 +1,11 @@
 import React from 'react';
-import Navbars from "../Components/Navbar";
+import Navbars from "../Components/Navbar"; // Importamos el componente de navegación
 import '../App.css'; // Importamos los estilos generales
 
 const AboutUs = () => {
   return (
     <>
-      <Navbars />
+      <Navbars /> {/* Incluye la barra de navegación */}
       <div className="contenedor">
         <h1>Acerca De Nosotros</h1>
         <p>

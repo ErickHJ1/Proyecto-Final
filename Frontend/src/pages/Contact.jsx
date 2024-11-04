@@ -1,34 +1,39 @@
 import React, { useState } from 'react';
-import emailjs from 'emailjs-com';
+import emailjs from 'emailjs-com'; // Librería para enviar emails
 import '../App.css'; // Importamos los estilos generales
 
 const BusinessInfo = () => {
+  // Estado para almacenar los datos del formulario
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: ''
   });
 
+  // Maneja los cambios en los campos del formulario
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Maneja el envío del formulario
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Previene la recarga de la página al enviar el formulario
 
-    // Reemplazar con tus propios valores de EmailJS
+    // Configura los valores de EmailJS
     const serviceId = 'service_t36arsi';
     const templateId = 'template_4zydzs7';
     const userId = 'iLHqMas2iBWJrzzVu';
 
+    // Envía el formulario a través de EmailJS
     emailjs.send(serviceId, templateId, formData, userId)
       .then((response) => {
-        alert('Mensaje enviado con éxito!');
+        alert('Mensaje enviado con éxito!'); // Muestra alerta de éxito
       })
       .catch((err) => {
-        console.error('Error al enviar el mensaje:', err);
+        console.error('Error al enviar el mensaje:', err); // Muestra error en la consola
       });
 
+    // Limpia el formulario después del envío
     setFormData({ name: '', email: '', message: '' });
   };
 
@@ -91,7 +96,7 @@ const BusinessInfo = () => {
         </ul>
       </div>
 
-      {/* Ubicación */}
+      {/* Ubicación del negocio con un iframe de Google Maps */}
       <div className="ubicacion">
         <h3>Ubicación</h3>
         <p>De la Iglesia de Río Oro 300 metros norte y 50 metros este, C. Ross, Río Oro</p>

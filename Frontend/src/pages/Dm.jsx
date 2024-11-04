@@ -3,10 +3,10 @@ import Chat from "../Components/Chat"
 
 
 const Dm = () => {
-    // const nombreUsuario = Cookies.get('')
+     const nombreUsuario = Cookies.get('idPropServicio')
 return(
     <>
-    <Chat username={"Pepe pene loco"}/>
+    <Chat username={nombreUsuario}/>
     </>
 )
 }
